@@ -1,0 +1,62 @@
+const { pool } = require('../config/db');
+const { success, error } = require('../utils/response');
+
+async function getMyProfile(req, res, next) {
+  try {
+    const [rows] = await pool.query('SELECT * FROM recipient_profiles WHERE user_id = ?', [req.user.id]);
+    if (!rows.length) return error(res, 'Recipient profile not found', 404);
+    return success(res, rows[0]);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function updateMyProfile(req, res, next) {
+  try {
+    const fields = ['blood_group', 'date_of_birth', 'gender', 'address', 'city', 'state', 'country', 'latitude', 'longitude'];
+    const updates = [];
+    const values = [];
+    fields.forEach((f) => {
+      if (req.body[f] !== undefined) {
+        updates.push(`${f} = ?`);
+        values.push(req.body[f]);
+      }
+    });
+    if (!updates.length) return error(res, 'No valid fields to update', 400);
+    values.push(req.user.id);
+
+    await pool.query(`UPDATE recipient_profiles SET ${updates.join(', ')} WHERE user_id = ?`, values);
+    const [rows] = await pool.query('SELECT * FROM recipient_profiles WHERE user_id = ?', [req.user.id]);
+    return success(res, rows[0], 'Recipient profile updated');
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function myRequestHistory(req, res, next) {
+  try {
+    const [recRow] = await pool.query('SELECT id FROM recipient_profiles WHERE user_id = ?', [req.user.id]);
+    if (!recRow.length) return error(res, 'Recipient profile not found', 404);
+    const recipientId = recRow[0].id;
+
+    const [bloodReqs] = await pool.query(
+      `SELECT br.*, h.hospital_name, bb.bank_name FROM blood_requests br
+       LEFT JOIN hospitals h ON h.id = br.hospital_id
+       LEFT JOIN blood_banks bb ON bb.id = br.blood_bank_id
+       WHERE br.recipient_id = ? ORDER BY br.created_at DESC`,
+      [recipientId]
+    );
+    const [organReqs] = await pool.query(
+      `SELECT o.*, h.hospital_name FROM organ_requests o
+       LEFT JOIN hospitals h ON h.id = o.hospital_id
+       WHERE o.recipient_id = ? ORDER BY o.created_at DESC`,
+      [recipientId]
+    );
+
+    return success(res, { bloodRequests: bloodReqs, organRequests: organReqs });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { getMyProfile, updateMyProfile, myRequestHistory };
