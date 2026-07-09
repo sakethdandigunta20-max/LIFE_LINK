@@ -169,23 +169,7 @@ export default function Login() {
 
         </div>
 
-        {/* Demo Accounts */}
-        <div className="mt-6 rounded-lg bg-white shadow-sm border p-4 text-xs text-gray-600">
 
-          <h3 className="font-bold mb-2 text-gray-800">
-            Demo Accounts
-          </h3>
-
-          <p><strong>Admin:</strong> admin@example.com</p>
-          <p><strong>Hospital:</strong> apollo@test.com</p>
-          <p><strong>Blood Bank:</strong> bloodbank@test.com</p>
-          <p><strong>Recipient:</strong> recipient@test.com</p>
-
-          <p className="mt-2">
-            <strong>Password:</strong> Password123
-          </p>
-
-        </div>
 
       </div>
     </div>
