@@ -1,54 +1,210 @@
-# ❤️ LifeLink — Smart Blood & Organ Donation Management System
+# ❤️ LifeLink – Smart Blood & Organ Donation Matching System
 
-LifeLink is a full-stack healthcare platform that connects **Donors**, **Recipients**, **Hospitals**, **Blood Banks**, and **Administrators** to streamline blood and organ donation, request management, inventory tracking, and intelligent donor matching.
+A full-stack healthcare platform that connects **Donors**, **Recipients**, **Hospitals**, **Blood Banks**, and **Administrators** to simplify blood and organ donation management through secure authentication, intelligent matching, real-time request management, and analytics.
 
 ---
 
-# 🚀 Tech Stack
+## 🌐 Live Demo
 
-| Layer | Technology |
-|--------|------------|
-| Frontend | React 18, Vite, Tailwind CSS, React Router DOM |
-| Backend | Node.js, Express.js |
-| Database | Supabase PostgreSQL |
-| Authentication | JWT, bcrypt |
-| API Client | Axios |
-| Charts | Recharts |
-| Icons | Lucide React |
-| Notifications | React Hot Toast |
-| File Uploads | Multer |
-| Reports | PDFKit, json2csv |
-| Deployment | Vercel (Frontend), Render (Backend), Supabase (Database) |
+### Frontend
+**https://life-link-uc46.vercel.app**
+
+### Backend API
+**https://lifelink-backend-o3q0.onrender.com/api**
+
+### Health Check
+**https://lifelink-backend-o3q0.onrender.com/api/health**
+
+---
+
+# 📖 Project Overview
+
+LifeLink is a centralized platform that enables efficient coordination between donors, recipients, hospitals, blood banks, and administrators.
+
+The system allows:
+
+- Blood donation management
+- Organ donation requests
+- Hospital assignment
+- Blood inventory tracking
+- Intelligent donor matching
+- Analytics & Reports
+- Secure role-based authentication
+
+---
+
+# 🚀 Features
+
+## 🔐 Authentication
+
+- JWT Authentication
+- Secure password hashing using bcrypt
+- Role-Based Access Control
+- Login & Registration
+- Protected Routes
+
+---
+
+## 👤 Donor Module
+
+- Register as Blood/Organ Donor
+- Manage Donor Profile
+- Update Availability
+- Blood Group Information
+- Organ Donation Preferences
+- Donation History
+
+---
+
+## 🩸 Recipient Module
+
+- Create Blood Requests
+- Create Organ Requests
+- Select Hospital
+- Upload Medical Information
+- Track Request Status
+- View Assigned Hospital
+
+---
+
+## 🏥 Hospital Module
+
+- View Patient Requests
+- Approve Organ Requests
+- Manage Patients
+- Update Request Status
+- View Matching Donors
+
+---
+
+## 🏦 Blood Bank Module
+
+- Blood Inventory Management
+- Add Blood Stock
+- Update Inventory
+- Approve Blood Requests
+- View Blood Request History
+
+---
+
+## 👨‍💼 Admin Module
+
+- Dashboard Analytics
+- User Management
+- Hospital Verification
+- Blood Bank Verification
+- Reports
+- System Monitoring
+
+---
+
+## 🔍 Search Module
+
+Search:
+
+- Donors
+- Hospitals
+- Blood Banks
+- Emergency Requests
+
+---
+
+## 📊 Analytics
+
+Interactive charts for:
+
+- Blood Group Distribution
+- Donation Trends
+- Request Statistics
+- Emergency Requests
+- User Registrations
+- Blood Inventory
+- Hospital Activities
+
+---
+
+## 📄 Reports
+
+Generate:
+
+- PDF Reports
+- CSV Reports
+
+---
+
+# 🛠 Tech Stack
+
+## Frontend
+
+- React 18
+- Vite
+- Tailwind CSS
+- React Router
+- Axios
+- Recharts
+- Lucide React
+- React Hot Toast
+
+---
+
+## Backend
+
+- Node.js
+- Express.js
+- PostgreSQL
+- Supabase
+- JWT Authentication
+- bcrypt
+- Multer
+- Helmet
+- CORS
+- Express Rate Limit
+- Compression
+
+---
+
+## Database
+
+- Supabase PostgreSQL
+
+---
+
+## Deployment
+
+### Frontend
+
+- Vercel
+
+### Backend
+
+- Render
+
+### Database
+
+- Supabase
 
 ---
 
 # 📂 Project Structure
 
 ```
-blood-organ-donation-system/
+LifeLink/
+│
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   └── vite.config.js
 │
 ├── backend/
 │   ├── config/
-│   │     └── db.js
 │   ├── controllers/
 │   ├── middleware/
 │   ├── routes/
 │   ├── utils/
 │   ├── db/
-│   │     ├── schema.sql
-│   │     └── seed.js
 │   ├── uploads/
 │   ├── server.js
-│   └── package.json
-│
-├── frontend/
-│   ├── src/
-│   │     ├── components/
-│   │     ├── context/
-│   │     ├── lib/
-│   │     ├── pages/
-│   │     ├── App.jsx
-│   │     └── main.jsx
 │   └── package.json
 │
 └── README.md
@@ -56,147 +212,15 @@ blood-organ-donation-system/
 
 ---
 
-# ✨ Features
-
-## 🔐 Authentication
-
-- JWT Authentication
-- Secure Password Hashing (bcrypt)
-- Role Based Authorization
-- Protected Routes
-- Login & Registration
-- Session Management
-
----
-
-## ❤️ Donor Module
-
-- Donor Registration
-- Donor Profile
-- Blood Group Management
-- Organ Donation Preferences
-- Availability Toggle
-- Donation History
-- Smart Request Recommendations
-
----
-
-## 🩸 Recipient Module
-
-- Blood Requests
-- Organ Requests
-- Hospital Assignment
-- Request Tracking
-- Cancel Requests
-- Request History
-
----
-
-## 🏥 Hospital Module
-
-- Hospital Verification
-- View Assigned Patients
-- Manage Blood Requests
-- Manage Organ Requests
-- Approve / Reject Requests
-- Patient Dashboard
-
----
-
-## 🩸 Blood Bank Module
-
-- Blood Inventory
-- Stock Management
-- Blood Request Approval
-- Inventory Updates
-- Request Fulfillment
-
----
-
-## 👨‍💼 Admin Module
-
-- User Management
-- Hospital Verification
-- Blood Bank Verification
-- Emergency Monitoring
-- Analytics Dashboard
-- Reports
-- Notifications
-
----
-
-## 🔔 Notifications
-
-- Database-backed Notifications
-- Read / Unread Status
-- Mark All Read
-- Emergency Alerts
-
----
-
-## 🔍 Search
-
-Search for
-
-- Donors
-- Hospitals
-- Blood Banks
-- Emergency Requests
-
-using advanced filters.
-
----
-
-## 📊 Analytics
-
-Dashboard includes
-
-- Total Users
-- Active Donors
-- Blood Requests
-- Organ Requests
-- Blood Stock
-- Emergency Requests
-- Hospitals
-- Blood Banks
-
----
-
-## 📄 Reports
-
-Generate
-
-- PDF Reports
-- CSV Reports
-
-for
-
-- Users
-- Donations
-- Requests
-- Blood Inventory
-- Hospitals
-- Blood Banks
-
----
-
-# 🔑 User Roles
-
-- Admin
-- Donor
-- Recipient
-- Hospital
-- Blood Bank
-
----
-
-# ⚙️ Installation
+# ⚙ Installation
 
 ## Clone Repository
 
 ```bash
 git clone https://github.com/sakethdandigunta20-max/LIFE_LINK.git
+```
 
+```
 cd LIFE_LINK
 ```
 
@@ -204,51 +228,45 @@ cd LIFE_LINK
 
 ## Backend Setup
 
-```bash
+```
 cd backend
-
 npm install
-
-cp .env.example .env
 ```
 
-Configure
+Create `.env`
 
 ```
-DATABASE_URL=
-
-JWT_SECRET=
-
+NODE_ENV=development
 PORT=5000
 
-NODE_ENV=development
+DB_HOST=YOUR_SUPABASE_HOST
+DB_PORT=5432
+DB_NAME=postgres
+DB_USER=YOUR_DB_USER
+DB_PASSWORD=YOUR_DB_PASSWORD
+
+JWT_SECRET=YOUR_SECRET
+JWT_EXPIRES_IN=7d
+
+FRONTEND_URL=http://localhost:5173
 ```
 
 Run
 
-```bash
-npm run seed
-
+```
 npm run dev
-```
-
-Backend runs on
-
-```
-http://localhost:5000
 ```
 
 ---
 
 ## Frontend Setup
 
-```bash
-cd frontend
-
-npm install
-
-cp .env.example .env
 ```
+cd frontend
+npm install
+```
+
+Create `.env`
 
 ```
 VITE_API_URL=http://localhost:5000/api
@@ -256,109 +274,128 @@ VITE_API_URL=http://localhost:5000/api
 
 Run
 
-```bash
+```
 npm run dev
 ```
 
-Frontend runs on
-
-```
-http://localhost:5173
-```
-
 ---
 
-# 👤 Demo Accounts
-
-| Role | Email | Password |
-|-------|-------|----------|
-| Admin | admin@example.com | Password123! |
-| Hospital | hospital@example.com | Password123! |
-| Blood Bank | bloodbank@example.com | Password123! |
-| Donor | donor1@example.com | Password123! |
-| Recipient | recipient@example.com | Password123! |
-
----
-
-# 🔒 Security
-
-- JWT Authentication
-- bcrypt Password Hashing
-- Role-Based Authorization
-- Helmet Security
-- Rate Limiting
-- Parameterized SQL Queries
-- File Upload Validation
-- Centralized Error Handling
-- Secure Password Storage
-
----
-
-# 🌐 Deployment
+# 🌍 Deployment
 
 ## Frontend
 
-Deploy on **Vercel**
-
-Environment Variable
+Hosted on **Vercel**
 
 ```
-VITE_API_URL=https://your-backend.onrender.com/api
+https://life-link-uc46.vercel.app
 ```
 
 ---
 
 ## Backend
 
-Deploy on **Render**
-
-Environment Variables
+Hosted on **Render**
 
 ```
-DATABASE_URL=
-
-JWT_SECRET=
-
-NODE_ENV=production
-
-PORT=10000
+https://lifelink-backend-o3q0.onrender.com
 ```
 
 ---
 
 ## Database
 
-Hosted on
-
-**Supabase PostgreSQL**
+Hosted on **Supabase PostgreSQL**
 
 ---
 
-# 📌 Future Enhancements
+# 🔒 Security Features
 
-- AI-based Donor Recommendation
-- Real-time Notifications (Socket.IO)
-- Google Maps Integration
-- SMS & Email Notifications
-- Mobile Application
-- Multi-language Support
-- Machine Learning Donor Prediction
-- Appointment Scheduling
+- JWT Authentication
+- Password Hashing (bcrypt)
+- Helmet Security
+- CORS Protection
+- Rate Limiting
+- SQL Parameterized Queries
+- Role-Based Authorization
 
 ---
 
-# 👨‍💻 Developer
+# 📸 Screenshots
+
+Add screenshots here.
+
+Example:
+
+```
+screenshots/
+
+Login.png
+
+AdminDashboard.png
+
+DonorDashboard.png
+
+RecipientDashboard.png
+
+HospitalDashboard.png
+
+BloodBankDashboard.png
+
+Analytics.png
+```
+
+---
+
+# 🧪 Demo Accounts
+
+> **These accounts are intended only for demonstration/testing.**
+
+| Role | Email |
+|-------|-------|
+| Hospital | apollo@test.com |
+| Blood Bank | bloodbank@test.com |
+| Recipient | recipient@test.com |
+
+**Password**
+
+```
+Password123
+```
+
+> If demo accounts are unavailable, register a new account through the application.
+
+---
+
+# 👨‍💻 Developed By
 
 **Saketh Dandigunta**
 
+B.Tech Computer Science Engineering
+
 SRM University AP
 
-B.Tech Computer Science & Engineering
-
-Cloud Computing Specialization
+GitHub:
+https://github.com/sakethdandigunta20-max
 
 ---
 
-## ⭐ If you like this project
+# ⭐ Future Enhancements
 
-Give this repository a ⭐ on GitHub!
+- AI-Based Donor Recommendation
+- Email Notifications
+- SMS Alerts
+- Push Notifications
+- Live Chat
+- Google Maps Integration
+- Multi-language Support
+- Mobile Application
+
+---
+
+# 📄 License
+
+This project is developed for educational and academic purposes.
+
+---
+
+## ⭐ If you found this project useful, don't forget to star the repository!
