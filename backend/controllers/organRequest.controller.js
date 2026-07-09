@@ -1,136 +1,372 @@
-const { pool } = require('../config/db');
-const { success, error } = require('../utils/response');
-const { notifyUser, notifyRole } = require('../utils/notify');
+const { pool } = require("../config/db");
+const { success, error } = require("../utils/response");
+const { notifyUser, notifyRole } = require("../utils/notify");
 
+// POST /api/organ-requests
 async function createRequest(req, res, next) {
   try {
-    const [recRow] = await pool.query('SELECT id FROM recipient_profiles WHERE user_id = ?', [req.user.id]);
-    if (!recRow.length) return error(res, 'Complete your recipient profile first', 400);
-
-    const { organ_type, urgency = 'medium', hospital_id, notes } = req.body;
-    if (!organ_type) return error(res, 'organ_type is required', 400);
-
-    const documentPath = req.file ? `/uploads/${req.file.filename}` : null;
-
-    const [result] = await pool.query(
-      `INSERT INTO organ_requests (recipient_id, hospital_id, organ_type, urgency, document_path, notes)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [recRow[0].id, hospital_id || null, organ_type, urgency, documentPath, notes || null]
+    const recipientResult = await pool.query(
+      "SELECT id FROM recipient_profiles WHERE user_id = $1",
+      [req.user.id]
     );
 
-    if (urgency === 'critical') {
-      notifyRole('admin', 'Emergency Organ Request', `Critical ${organ_type} request created.`, 'emergency').catch(() => {});
-      notifyRole('hospital', 'Emergency Organ Request', `Critical ${organ_type} request needs review.`, 'emergency').catch(() => {});
+    if (!recipientResult.rows.length) {
+      return error(res, "Complete your recipient profile first", 400);
     }
 
-    const [rows] = await pool.query('SELECT * FROM organ_requests WHERE id = ?', [result.insertId]);
-    return success(res, rows[0], 'Organ request created', 201);
+    const recipientId = recipientResult.rows[0].id;
+
+    const {
+      organ_type,
+      urgency = "medium",
+      hospital_id,
+      notes,
+    } = req.body;
+
+    if (!organ_type) {
+      return error(res, "organ_type is required", 400);
+    }
+
+    const documentPath = req.file
+      ? `/uploads/${req.file.filename}`
+      : null;
+
+    const result = await pool.query(
+      `
+      INSERT INTO organ_requests
+      (
+        recipient_id,
+        hospital_id,
+        organ_type,
+        urgency,
+        document_path,
+        notes
+      )
+      VALUES ($1,$2,$3,$4,$5,$6)
+      RETURNING *
+      `,
+      [
+        recipientId,
+        hospital_id || null,
+        organ_type,
+        urgency,
+        documentPath,
+        notes || null,
+      ]
+    );
+
+    if (urgency === "critical") {
+      notifyRole(
+        "admin",
+        "Emergency Organ Request",
+        `Critical ${organ_type} request created.`,
+        "emergency"
+      ).catch(() => { });
+
+      notifyRole(
+        "hospital",
+        "Emergency Organ Request",
+        `Critical ${organ_type} request needs review.`,
+        "emergency"
+      ).catch(() => { });
+    }
+
+    return success(
+      res,
+      result.rows[0],
+      "Organ request created",
+      201
+    );
+
   } catch (err) {
     next(err);
   }
 }
 
+// GET /api/organ-requests/me
 async function myRequests(req, res, next) {
   try {
-    const [recRow] = await pool.query('SELECT id FROM recipient_profiles WHERE user_id = ?', [req.user.id]);
-    if (!recRow.length) return success(res, []);
-    const [rows] = await pool.query(
-      `SELECT o.*, h.hospital_name FROM organ_requests o LEFT JOIN hospitals h ON h.id = o.hospital_id
-       WHERE o.recipient_id = ? ORDER BY o.created_at DESC`,
-      [recRow[0].id]
+
+    const recipientResult = await pool.query(
+      "SELECT id FROM recipient_profiles WHERE user_id = $1",
+      [req.user.id]
     );
-    return success(res, rows);
+
+    if (!recipientResult.rows.length) {
+      return success(res, []);
+    }
+
+    const result = await pool.query(
+      `
+      SELECT
+        o.*,
+        h.hospital_name
+      FROM organ_requests o
+      LEFT JOIN hospitals h
+        ON h.id = o.hospital_id
+      WHERE o.recipient_id = $1
+      ORDER BY o.created_at DESC
+      `,
+      [recipientResult.rows[0].id]
+    );
+
+    return success(res, result.rows);
+
   } catch (err) {
     next(err);
   }
 }
 
+// GET /api/organ-requests
 async function listRequests(req, res, next) {
   try {
-    const { status, urgency, organ_type, page = 1, limit = 20 } = req.query;
+
+    const {
+      status,
+      urgency,
+      organ_type,
+      page = 1,
+      limit = 20,
+    } = req.query;
+
     const where = [];
     const values = [];
-    if (status) { where.push('o.status = ?'); values.push(status); }
-    if (urgency) { where.push('o.urgency = ?'); values.push(urgency); }
-    if (organ_type) { where.push('o.organ_type = ?'); values.push(organ_type); }
+    let index = 1;
 
-    const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+    if (status) {
+      where.push(`o.status = $${index++}`);
+      values.push(status);
+    }
+
+    if (urgency) {
+      where.push(`o.urgency = $${index++}`);
+      values.push(urgency);
+    }
+
+    if (organ_type) {
+      where.push(`o.organ_type = $${index++}`);
+      values.push(organ_type);
+    }
+
+    const whereSql = where.length
+      ? `WHERE ${where.join(" AND ")}`
+      : "";
+
     const offset = (Number(page) - 1) * Number(limit);
 
-    const [rows] = await pool.query(
-      `SELECT o.*, u.name AS recipient_name, u.phone AS recipient_phone, h.hospital_name
-       FROM organ_requests o
-       JOIN recipient_profiles rp ON rp.id = o.recipient_id
-       JOIN users u ON u.id = rp.user_id
-       LEFT JOIN hospitals h ON h.id = o.hospital_id
-       ${whereSql}
-       ORDER BY FIELD(o.urgency,'critical','high','medium','low'), o.created_at DESC
-       LIMIT ? OFFSET ?`,
+    const result = await pool.query(
+      `
+      SELECT
+        o.*,
+        u.name AS recipient_name,
+        u.phone AS recipient_phone,
+        h.hospital_name
+      FROM organ_requests o
+      JOIN recipient_profiles rp
+        ON rp.id = o.recipient_id
+      JOIN users u
+        ON u.id = rp.user_id
+      LEFT JOIN hospitals h
+        ON h.id = o.hospital_id
+      ${whereSql}
+      ORDER BY
+        CASE o.urgency
+          WHEN 'critical' THEN 1
+          WHEN 'high' THEN 2
+          WHEN 'medium' THEN 3
+          WHEN 'low' THEN 4
+          ELSE 5
+        END,
+        o.created_at DESC
+      LIMIT $${index++}
+      OFFSET $${index}
+      `,
       [...values, Number(limit), offset]
     );
-    const [countRows] = await pool.query(`SELECT COUNT(*) as total FROM organ_requests o ${whereSql}`, values);
-    return success(res, { requests: rows, total: countRows[0].total });
+
+    const countResult = await pool.query(
+      `
+      SELECT COUNT(*)::int AS total
+      FROM organ_requests o
+      ${whereSql}
+      `,
+      values
+    );
+
+    return success(res, {
+      requests: result.rows,
+      total: countResult.rows[0].total,
+    });
+
   } catch (err) {
     next(err);
   }
 }
 
+// PUT /api/organ-requests/:id/cancel
 async function cancelRequest(req, res, next) {
   try {
-    const [reqRow] = await pool.query(
-      `SELECT o.* FROM organ_requests o JOIN recipient_profiles rp ON rp.id = o.recipient_id WHERE o.id = ? AND rp.user_id = ?`,
+    const requestResult = await pool.query(
+      `
+      SELECT o.*
+      FROM organ_requests o
+      JOIN recipient_profiles rp
+        ON rp.id = o.recipient_id
+      WHERE o.id = $1
+        AND rp.user_id = $2
+      `,
       [req.params.id, req.user.id]
     );
-    if (!reqRow.length) return error(res, 'Request not found', 404);
-    if (['fulfilled', 'cancelled'].includes(reqRow[0].status)) return error(res, 'Request cannot be cancelled', 400);
 
-    await pool.query('UPDATE organ_requests SET status = "cancelled" WHERE id = ?', [req.params.id]);
-    return success(res, {}, 'Request cancelled');
+    if (!requestResult.rows.length) {
+      return error(res, "Request not found", 404);
+    }
+
+    if (
+      ["fulfilled", "cancelled"].includes(
+        requestResult.rows[0].status
+      )
+    ) {
+      return error(res, "Request cannot be cancelled", 400);
+    }
+
+    await pool.query(
+      `
+      UPDATE organ_requests
+      SET status = 'cancelled'
+      WHERE id = $1
+      `,
+      [req.params.id]
+    );
+
+    return success(res, {}, "Request cancelled");
+
   } catch (err) {
     next(err);
   }
 }
 
-// PUT /api/organ-requests/:id/status  (hospital/admin: approve, reject, fulfill)
+// PUT /api/organ-requests/:id/status
 async function updateStatus(req, res, next) {
-  const conn = await pool.getConnection();
+  const client = await pool.connect();
+
   try {
-    const { status, donor_id } = req.body; // donor_id = donor_profiles.id for fulfillment
-    if (!['approved', 'rejected', 'fulfilled'].includes(status)) return error(res, 'Invalid status', 400);
+    const { status, donor_id } = req.body;
 
-    const [rows] = await conn.query('SELECT * FROM organ_requests WHERE id = ?', [req.params.id]);
-    if (!rows.length) return error(res, 'Request not found', 404);
-    const request = rows[0];
+    if (!["approved", "rejected", "fulfilled"].includes(status)) {
+      client.release();
+      return error(res, "Invalid status", 400);
+    }
 
-    await conn.beginTransaction();
+    await client.query("BEGIN");
 
-    if (status === 'fulfilled' && donor_id) {
-      await conn.query(
-        `INSERT INTO donations (donor_id, type, organ_request_id, hospital_id, status, donation_date)
-         VALUES (?, 'organ', ?, ?, 'scheduled', CURDATE())`,
-        [donor_id, request.id, request.hospital_id]
+    const requestResult = await client.query(
+      `
+      SELECT *
+      FROM organ_requests
+      WHERE id = $1
+      FOR UPDATE
+      `,
+      [req.params.id]
+    );
+
+    if (!requestResult.rows.length) {
+      await client.query("ROLLBACK");
+      client.release();
+      return error(res, "Request not found", 404);
+    }
+
+    const request = requestResult.rows[0];
+
+    if (status === "fulfilled" && donor_id) {
+      await client.query(
+        `
+        INSERT INTO donations
+        (
+          donor_id,
+          type,
+          organ_request_id,
+          hospital_id,
+          status,
+          donation_date
+        )
+        VALUES
+        ($1,'organ',$2,$3,'scheduled',CURRENT_DATE)
+        `,
+        [
+          donor_id,
+          request.id,
+          request.hospital_id,
+        ]
       );
     }
 
-    await conn.query('UPDATE organ_requests SET status = ? WHERE id = ?', [status, req.params.id]);
-    await conn.commit();
+    await client.query(
+      `
+      UPDATE organ_requests
+      SET status = $1
+      WHERE id = $2
+      `,
+      [
+        status,
+        req.params.id,
+      ]
+    );
 
-    const [recUser] = await pool.query(
-      'SELECT u.id FROM users u JOIN recipient_profiles rp ON rp.user_id = u.id WHERE rp.id = ?',
+    await client.query("COMMIT");
+    client.release();
+
+    const recipientResult = await pool.query(
+      `
+      SELECT u.id
+      FROM users u
+      JOIN recipient_profiles rp
+        ON rp.user_id = u.id
+      WHERE rp.id = $1
+      `,
       [request.recipient_id]
     );
-    if (recUser.length) {
-      notifyUser(recUser[0].id, `Organ Request ${status}`, `Your ${request.organ_type} request was ${status}.`, status === 'rejected' ? 'warning' : 'success').catch(() => {});
+
+    if (recipientResult.rows.length) {
+      notifyUser(
+        recipientResult.rows[0].id,
+        `Organ Request ${status}`,
+        `Your ${request.organ_type} request was ${status}.`,
+        status === "rejected"
+          ? "warning"
+          : "success"
+      ).catch(() => { });
     }
 
-    const [updated] = await pool.query('SELECT * FROM organ_requests WHERE id = ?', [req.params.id]);
-    return success(res, updated[0], `Request marked as ${status}`);
+    const updated = await pool.query(
+      `
+      SELECT *
+      FROM organ_requests
+      WHERE id = $1
+      `,
+      [req.params.id]
+    );
+
+    return success(
+      res,
+      updated.rows[0],
+      `Request marked as ${status}`
+    );
+
   } catch (err) {
-    await conn.rollback();
+    try {
+      await client.query("ROLLBACK");
+    } catch { }
+
+    client.release();
     next(err);
-  } finally {
-    conn.release();
   }
 }
 
-module.exports = { createRequest, myRequests, listRequests, cancelRequest, updateStatus };
+module.exports = {
+  createRequest,
+  myRequests,
+  listRequests,
+  cancelRequest,
+  updateStatus,
+};

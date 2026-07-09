@@ -13,32 +13,76 @@ export default function RecipientRequests() {
   const [bloodReqs, setBloodReqs] = useState([]);
   const [organReqs, setOrganReqs] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ blood_group: 'O+', organ_type: 'kidney', units_needed: 1, urgency: 'medium', notes: '' });
+  const [form, setForm] = useState({
+    blood_group: 'O+',
+    organ_type: 'kidney',
+    hospital_id: '',
+    units_needed: 1,
+    urgency: 'medium',
+    notes: ''
+  });
   const [submitting, setSubmitting] = useState(false);
+  const [hospitals, setHospitals] = useState([]);
 
   const load = () => {
     api.get('/blood-requests/me').then((res) => setBloodReqs(res.data.data));
     api.get('/organ-requests/me').then((res) => setOrganReqs(res.data.data));
   };
 
-  useEffect(load, []);
+  useEffect(() => {
+    load();
 
+    api
+      .get('/search', {
+        params: {
+          type: 'hospitals',
+        },
+      })
+      .then((res) => {
+        console.log("Hospitals Response:", res.data);
+        setHospitals(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Failed to load hospitals");
+      });
+
+  }, []);
   const submit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
+
     try {
-      if (tab === 'blood') {
-        await api.post('/blood-requests', {
-          blood_group: form.blood_group, units_needed: Number(form.units_needed), urgency: form.urgency, notes: form.notes,
+      if (tab === "blood") {
+        await api.post("/blood-requests", {
+          blood_group: form.blood_group,
+          units_needed: Number(form.units_needed),
+          urgency: form.urgency,
+          notes: form.notes,
         });
       } else {
-        await api.post('/organ-requests', { organ_type: form.organ_type, urgency: form.urgency, notes: form.notes });
+        if (!form.hospital_id) {
+          toast.error("Please select a hospital");
+          setSubmitting(false);
+          return;
+        }
+
+        console.log("Form Data:", form);
+
+        await api.post("/organ-requests", {
+          organ_type: form.organ_type,
+          hospital_id: Number(form.hospital_id),
+          urgency: form.urgency,
+          notes: form.notes,
+        });
       }
-      toast.success('Request submitted');
+
+      toast.success("Request submitted");
       setShowModal(false);
       load();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to submit request');
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to submit request");
     } finally {
       setSubmitting(false);
     }
@@ -67,9 +111,8 @@ export default function RecipientRequests() {
         {['blood', 'organ'].map((t) => (
           <button
             key={t} onClick={() => setTab(t)}
-            className={`px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px capitalize ${
-              tab === t ? 'border-brand-600 text-brand-600' : 'border-transparent text-gray-500'
-            }`}
+            className={`px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px capitalize ${tab === t ? 'border-brand-600 text-brand-600' : 'border-transparent text-gray-500'
+              }`}
           >
             {t} Requests
           </button>
@@ -119,22 +162,85 @@ export default function RecipientRequests() {
                 <>
                   <div>
                     <label className="label">Blood Group</label>
-                    <select className="input" value={form.blood_group} onChange={(e) => setForm({ ...form, blood_group: e.target.value })}>
-                      {BLOOD_GROUPS.map((g) => <option key={g} value={g}>{g}</option>)}
+                    <select
+                      className="input"
+                      value={form.blood_group}
+                      onChange={(e) =>
+                        setForm({ ...form, blood_group: e.target.value })
+                      }
+                    >
+                      {BLOOD_GROUPS.map((g) => (
+                        <option key={g} value={g}>
+                          {g}
+                        </option>
+                      ))}
                     </select>
                   </div>
+
                   <div>
                     <label className="label">Units Needed</label>
-                    <input type="number" min="1" className="input" value={form.units_needed} onChange={(e) => setForm({ ...form, units_needed: e.target.value })} />
+                    <input
+                      type="number"
+                      min="1"
+                      className="input"
+                      value={form.units_needed}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          units_needed: e.target.value,
+                        })
+                      }
+                    />
                   </div>
                 </>
               ) : (
-                <div>
-                  <label className="label">Organ Type</label>
-                  <select className="input" value={form.organ_type} onChange={(e) => setForm({ ...form, organ_type: e.target.value })}>
-                    {ORGAN_TYPES.map((o) => <option key={o} value={o} className="capitalize">{o}</option>)}
-                  </select>
-                </div>
+                <>
+                  {/* Organ Type */}
+                  <div>
+                    <label className="label">Organ Type</label>
+
+                    <select
+                      className="input"
+                      value={form.organ_type}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          organ_type: e.target.value,
+                        })
+                      }
+                    >
+                      {ORGAN_TYPES.map((o) => (
+                        <option key={o} value={o}>
+                          {o}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Hospital */}
+                  <div>
+                    <label className="label">Hospital</label>
+
+                    <select
+                      className="input"
+                      value={form.hospital_id}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          hospital_id: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Select Hospital</option>
+
+                      {hospitals.map((hospital) => (
+                        <option key={hospital.id} value={hospital.id}>
+                          {hospital.hospital_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
               )}
               <div>
                 <label className="label">Urgency</label>
