@@ -1,119 +1,364 @@
-# LifeLink — Smart Blood & Organ Donation Matching System
+# ❤️ LifeLink — Smart Blood & Organ Donation Management System
 
-A full-stack platform connecting **Donors**, **Recipients**, **Hospitals**, **Blood Banks**, and **Administrators** to streamline blood and organ donation matching, requests, inventory, and reporting.
+LifeLink is a full-stack healthcare platform that connects **Donors**, **Recipients**, **Hospitals**, **Blood Banks**, and **Administrators** to streamline blood and organ donation, request management, inventory tracking, and intelligent donor matching.
 
-## Tech Stack
+---
 
-| Layer     | Technology |
-|-----------|------------|
-| Frontend  | React 18, Vite, Tailwind CSS, React Router, Recharts, Axios |
-| Backend   | Node.js, Express, MySQL (mysql2), JWT auth, bcrypt |
-| Reports   | pdfkit (PDF), json2csv (CSV) |
-| Uploads   | Multer (medical documents, profile pictures) |
+# 🚀 Tech Stack
 
-## Project Structure
+| Layer | Technology |
+|--------|------------|
+| Frontend | React 18, Vite, Tailwind CSS, React Router DOM |
+| Backend | Node.js, Express.js |
+| Database | Supabase PostgreSQL |
+| Authentication | JWT, bcrypt |
+| API Client | Axios |
+| Charts | Recharts |
+| Icons | Lucide React |
+| Notifications | React Hot Toast |
+| File Uploads | Multer |
+| Reports | PDFKit, json2csv |
+| Deployment | Vercel (Frontend), Render (Backend), Supabase (Database) |
+
+---
+
+# 📂 Project Structure
 
 ```
 blood-organ-donation-system/
+│
 ├── backend/
-│   ├── config/db.js            # MySQL pool + connection check
-│   ├── controllers/            # Business logic per module
-│   ├── routes/                 # Express route definitions
-│   ├── middleware/              # auth, upload, error handling
-│   ├── utils/                  # jwt, matching engine, notifications, validators
-│   ├── db/schema.sql           # Full MySQL schema
-│   ├── db/seed.js              # Demo data seeder
-│   └── server.js               # App entrypoint
-└── frontend/
-    ├── src/pages/               # Route-level pages, grouped by role
-    ├── src/components/          # Shared UI (layout, cards, badges)
-    ├── src/context/AuthContext.jsx
-    └── src/lib/api.js           # Axios client with JWT interceptor
+│   ├── config/
+│   │     └── db.js
+│   ├── controllers/
+│   ├── middleware/
+│   ├── routes/
+│   ├── utils/
+│   ├── db/
+│   │     ├── schema.sql
+│   │     └── seed.js
+│   ├── uploads/
+│   ├── server.js
+│   └── package.json
+│
+├── frontend/
+│   ├── src/
+│   │     ├── components/
+│   │     ├── context/
+│   │     ├── lib/
+│   │     ├── pages/
+│   │     ├── App.jsx
+│   │     └── main.jsx
+│   └── package.json
+│
+└── README.md
 ```
 
-## Core Modules Implemented
+---
 
-1. **Authentication** — JWT-based, role-based (donor/recipient/hospital/bloodbank/admin), bcrypt password hashing, rate-limited login/register.
-2. **Donor Registration & Profile** — Blood group, medical info, geolocation, organ donor opt-in, availability toggle.
-3. **Recipient Registration & Requests** — Blood/organ requests with urgency, hospital routing, document upload.
-4. **Matching Engine** (`utils/matchingEngine.js`) — Blood-group compatibility matrix + Haversine distance + eligibility/availability scoring, ranks donors per request.
-5. **Blood Bank Management** — Inventory per blood group (8 types), request approval/fulfillment with transactional stock deduction.
-6. **Hospital Management** — Verification workflow, patient request coordination, organ approval workflow.
-7. **Blood & Organ Request Management** — Full CRUD + status lifecycle: pending → approved/rejected → fulfilled/cancelled.
-8. **Donor/Recipient/Hospital/Blood Bank/Admin Dashboards** — Role-specific stats, history, and recommendations.
-9. **Search & Filter** — Cross-entity search (donors, blood banks, hospitals, emergency requests).
-10. **Notifications** — DB-backed, polled every 30s, emergency broadcast to relevant roles.
-11. **Analytics Dashboard** — 7 chart endpoints (stock, trends, distribution, registrations, emergencies, facility activity) rendered with Recharts.
-12. **Reports** — CSV and PDF generation for 7 report types (donations, requests, inventory, hospitals, blood banks, users).
-13. **Profile Management** — Update info, change password, upload picture, deactivate account.
+# ✨ Features
 
-## Getting Started
+## 🔐 Authentication
 
-### 1. Database
+- JWT Authentication
+- Secure Password Hashing (bcrypt)
+- Role Based Authorization
+- Protected Routes
+- Login & Registration
+- Session Management
+
+---
+
+## ❤️ Donor Module
+
+- Donor Registration
+- Donor Profile
+- Blood Group Management
+- Organ Donation Preferences
+- Availability Toggle
+- Donation History
+- Smart Request Recommendations
+
+---
+
+## 🩸 Recipient Module
+
+- Blood Requests
+- Organ Requests
+- Hospital Assignment
+- Request Tracking
+- Cancel Requests
+- Request History
+
+---
+
+## 🏥 Hospital Module
+
+- Hospital Verification
+- View Assigned Patients
+- Manage Blood Requests
+- Manage Organ Requests
+- Approve / Reject Requests
+- Patient Dashboard
+
+---
+
+## 🩸 Blood Bank Module
+
+- Blood Inventory
+- Stock Management
+- Blood Request Approval
+- Inventory Updates
+- Request Fulfillment
+
+---
+
+## 👨‍💼 Admin Module
+
+- User Management
+- Hospital Verification
+- Blood Bank Verification
+- Emergency Monitoring
+- Analytics Dashboard
+- Reports
+- Notifications
+
+---
+
+## 🔔 Notifications
+
+- Database-backed Notifications
+- Read / Unread Status
+- Mark All Read
+- Emergency Alerts
+
+---
+
+## 🔍 Search
+
+Search for
+
+- Donors
+- Hospitals
+- Blood Banks
+- Emergency Requests
+
+using advanced filters.
+
+---
+
+## 📊 Analytics
+
+Dashboard includes
+
+- Total Users
+- Active Donors
+- Blood Requests
+- Organ Requests
+- Blood Stock
+- Emergency Requests
+- Hospitals
+- Blood Banks
+
+---
+
+## 📄 Reports
+
+Generate
+
+- PDF Reports
+- CSV Reports
+
+for
+
+- Users
+- Donations
+- Requests
+- Blood Inventory
+- Hospitals
+- Blood Banks
+
+---
+
+# 🔑 User Roles
+
+- Admin
+- Donor
+- Recipient
+- Hospital
+- Blood Bank
+
+---
+
+# ⚙️ Installation
+
+## Clone Repository
 
 ```bash
-mysql -u root -p < backend/db/schema.sql
+git clone https://github.com/sakethdandigunta20-max/LIFE_LINK.git
+
+cd LIFE_LINK
 ```
 
-### 2. Backend
+---
+
+## Backend Setup
 
 ```bash
 cd backend
-cp .env.example .env      # edit DB credentials + JWT secret
+
 npm install
-npm run seed               # optional: creates demo accounts (password: Password123!)
-npm run dev                 # starts on http://localhost:5000
-```
 
-### 3. Frontend
-
-```bash
-cd frontend
 cp .env.example .env
-npm install
-npm run dev                 # starts on http://localhost:5173
 ```
 
-The Vite dev server proxies `/api` and `/uploads` to `http://localhost:5000` automatically.
+Configure
 
-## Demo Accounts (after running `npm run seed`)
+```
+DATABASE_URL=
 
-| Role       | Email                     | Password      |
-|------------|---------------------------|---------------|
-| Admin      | admin@example.com         | Password123!  |
-| Hospital   | hospital@example.com      | Password123!  |
-| Blood Bank | bloodbank@example.com     | Password123!  |
-| Donor      | donor1@example.com        | Password123!  |
-| Recipient  | recipient@example.com     | Password123!  |
+JWT_SECRET=
 
-## Security Notes
+PORT=5000
 
-- All SQL queries use parameterized statements (mysql2 `?` placeholders) — no string concatenation.
-- Passwords hashed with bcrypt (10 rounds).
-- JWT auth middleware + role-based `authorize()` guard on every sensitive route.
-- Helmet, CORS allow-list, and rate limiting (general + strict on auth endpoints) applied globally.
-- File uploads restricted by type (pdf/jpg/png/doc) and size (5MB).
-- Centralized error handler avoids leaking stack traces in production.
+NODE_ENV=development
+```
 
-## Deployment
+Run
 
-**Frontend (Vercel):**
+```bash
+npm run seed
+
+npm run dev
+```
+
+Backend runs on
+
+```
+http://localhost:5000
+```
+
+---
+
+## Frontend Setup
+
 ```bash
 cd frontend
-vercel deploy
+
+npm install
+
+cp .env.example .env
 ```
-Set `VITE_API_URL` to your deployed backend URL in Vercel project settings.
 
-**Backend (any Node-capable host — Railway, Render, a VPS, or Hostinger's Node.js hosting):**
-- Set environment variables from `.env.example` in your host's dashboard.
-- Run `npm install && npm start`.
-- Point `DB_HOST`/`DB_USER`/`DB_PASSWORD`/`DB_NAME` at your managed MySQL instance (PlanetScale, Hostinger MySQL, AWS RDS, etc).
+```
+VITE_API_URL=http://localhost:5000/api
+```
 
-> Note: this backend is Node.js/Express, not PHP. Classic shared hosts like plain XAMPP/InfinityFree only run PHP — they will not run this server directly. Use a Node-capable host (Railway, Render, Hostinger's Node.js/VPS plans, or your own VPS with PM2 + Nginx) for the backend, and keep MySQL on any MySQL-compatible host.
+Run
 
-## Next Iteration Ideas
+```bash
+npm run dev
+```
 
-- Automated test suite (Jest + Supertest for API, Vitest + RTL for frontend)
-- WebSocket-based real-time notifications (currently 30s polling)
-- Map-based nearby blood bank/donor visualization
-- Multi-language support
+Frontend runs on
+
+```
+http://localhost:5173
+```
+
+---
+
+# 👤 Demo Accounts
+
+| Role | Email | Password |
+|-------|-------|----------|
+| Admin | admin@example.com | Password123! |
+| Hospital | hospital@example.com | Password123! |
+| Blood Bank | bloodbank@example.com | Password123! |
+| Donor | donor1@example.com | Password123! |
+| Recipient | recipient@example.com | Password123! |
+
+---
+
+# 🔒 Security
+
+- JWT Authentication
+- bcrypt Password Hashing
+- Role-Based Authorization
+- Helmet Security
+- Rate Limiting
+- Parameterized SQL Queries
+- File Upload Validation
+- Centralized Error Handling
+- Secure Password Storage
+
+---
+
+# 🌐 Deployment
+
+## Frontend
+
+Deploy on **Vercel**
+
+Environment Variable
+
+```
+VITE_API_URL=https://your-backend.onrender.com/api
+```
+
+---
+
+## Backend
+
+Deploy on **Render**
+
+Environment Variables
+
+```
+DATABASE_URL=
+
+JWT_SECRET=
+
+NODE_ENV=production
+
+PORT=10000
+```
+
+---
+
+## Database
+
+Hosted on
+
+**Supabase PostgreSQL**
+
+---
+
+# 📌 Future Enhancements
+
+- AI-based Donor Recommendation
+- Real-time Notifications (Socket.IO)
+- Google Maps Integration
+- SMS & Email Notifications
+- Mobile Application
+- Multi-language Support
+- Machine Learning Donor Prediction
+- Appointment Scheduling
+
+---
+
+# 👨‍💻 Developer
+
+**Saketh Dandigunta**
+
+SRM University AP
+
+B.Tech Computer Science & Engineering
+
+Cloud Computing Specialization
+
+---
+
+## ⭐ If you like this project
+
+Give this repository a ⭐ on GitHub!
