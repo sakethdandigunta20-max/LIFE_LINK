@@ -10,8 +10,8 @@ A full-stack healthcare platform that connects **Donors**, **Recipients**, **Hos
 **https://life-link-uc46.vercel.app**
 
 ### Backend API
-**https://lifelink-backend-o3q0.onrender.com/api**
-
+**[https://lifelink-backend-o3q0.onrender.com/api**
+](https://lifelink-backend-o3q0.onrender.com/api/health)
 ### Health Check
 **https://lifelink-backend-o3q0.onrender.com/api/health**
 
