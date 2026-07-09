@@ -319,41 +319,12 @@ Hosted on **Supabase PostgreSQL**
 - Role-Based Authorization
 
 ---
-
-# 📸 Screenshots
-
-Add screenshots here.
-
-Example:
-
-```
-screenshots/
-
-Login.png
-
-AdminDashboard.png
-
-DonorDashboard.png
-
-RecipientDashboard.png
-
-HospitalDashboard.png
-
-BloodBankDashboard.png
-
-Analytics.png
-```
-
----
-
 # 🧪 Demo Accounts
 
 > **These accounts are intended only for demonstration/testing.**
 
 | Role | Email |
 |-------|-------|
-| Hospital | apollo@test.com |
-| Blood Bank | bloodbank@test.com |
 | Recipient | recipient@test.com |
 
 **Password**
