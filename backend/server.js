@@ -28,9 +28,9 @@ const searchRoutes = require("./routes/search.routes");
 
 const app = express();
 
-/* -----------------------------
-   Security
------------------------------- */
+/* -----------------------------------
+   Security Middleware
+------------------------------------ */
 
 app.use(
   helmet({
@@ -38,9 +38,9 @@ app.use(
   })
 );
 
-/* -----------------------------
-   CORS
------------------------------- */
+/* -----------------------------------
+   CORS Configuration
+------------------------------------ */
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
@@ -50,7 +50,7 @@ const allowedOrigins = [
 app.use(
   cors({
     origin(origin, callback) {
-      // Allow Postman, curl, Render health checks
+      // Allow requests with no origin (Render health checks, Postman, curl)
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
@@ -63,9 +63,9 @@ app.use(
   })
 );
 
-/* -----------------------------
-   Middleware
------------------------------- */
+/* -----------------------------------
+   General Middleware
+------------------------------------ */
 
 app.use(compression());
 
@@ -81,9 +81,9 @@ app.use(
   express.static(path.join(__dirname, "uploads"))
 );
 
-/* -----------------------------
+/* -----------------------------------
    Rate Limiting
------------------------------- */
+------------------------------------ */
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -99,29 +99,29 @@ const authLimiter = rateLimit({
   max: 30,
   message: {
     success: false,
-    message: "Too many attempts, please try again later.",
+    message: "Too many attempts. Please try again later.",
   },
 });
 
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
 
-/* -----------------------------
+/* -----------------------------------
    Health Check
------------------------------- */
+------------------------------------ */
 
 app.get("/api/health", (req, res) => {
   res.json({
     success: true,
     message: "LifeLink Backend Running",
     environment: process.env.NODE_ENV,
-    time: new Date(),
+    timestamp: new Date(),
   });
 });
 
-/* -----------------------------
+/* -----------------------------------
    API Routes
------------------------------- */
+------------------------------------ */
 
 app.use("/api/auth", authRoutes);
 app.use("/api/donors", donorRoutes);
@@ -138,16 +138,16 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/search", searchRoutes);
 
-/* -----------------------------
+/* -----------------------------------
    Error Handling
------------------------------- */
+------------------------------------ */
 
 app.use(notFound);
 app.use(errorHandler);
 
-/* -----------------------------
+/* -----------------------------------
    Start Server
------------------------------- */
+------------------------------------ */
 
 const PORT = process.env.PORT || 5000;
 
