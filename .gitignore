@@ -1,9 +1,7 @@
-node_modules/
+# Environment files
 .env
-dist/
-build/
-*.log
-backend/uploads/*
-!backend/uploads/.gitkeep
-.DS_Store
-*.sqlite
+.env.*
+backend/.env
+backend/.env.*
+frontend/.env
+frontend/.env.*
