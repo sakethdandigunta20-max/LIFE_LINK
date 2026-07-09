@@ -1,5 +1,5 @@
 const { Pool } = require("pg");
-require("dotenv").config({ path: ".env.supabase" });
+require("dotenv").config();
 
 const pool = new Pool({
   host: process.env.DB_HOST,
@@ -14,14 +14,20 @@ const pool = new Pool({
 
 async function testConnection() {
   let client;
+
   try {
     client = await pool.connect();
+
     const result = await client.query("SELECT NOW()");
+
     console.log("✅ Connected to Supabase PostgreSQL!");
     console.log("Server time:", result.rows[0].now);
+
   } catch (err) {
-    console.error("❌ Connection failed:");
+    console.error("❌ Failed to connect to PostgreSQL");
     console.error(err);
+
+    process.exit(1);
   } finally {
     if (client) client.release();
   }
